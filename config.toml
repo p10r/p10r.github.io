@@ -6,6 +6,8 @@ compile_sass = true
 
 theme = "hook"
 
+title = "Philipp Mayer"
+
 # Whether to build a search index to be used later on by a JavaScript library
 build_search_index = false
 
@@ -17,3 +19,9 @@ highlight_theme = "agola-dark"
 
 [extra]
 # Put all your custom variables here
+
+
+links = [
+    { title = "Twitter", href = "https://twitter.com/p10r__" },
+    { title = "LinkedIn", href = "https://www.linkedin.com/in/philipp-%E2%98%95%EF%B8%8F-mayer-58a956199/" }
+]

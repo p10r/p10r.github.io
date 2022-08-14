@@ -1,8 +1,6 @@
-+++ 
-title = "Hi"
++++
+title = "Hi 👋"
 date = 2022-08-14
 +++
 
-# Hi
-
-Hello there.
+I'm trying to get into blogging - you'll see the results right here!
