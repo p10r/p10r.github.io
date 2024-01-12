@@ -7,14 +7,12 @@ on:
 
 jobs:
     build:
+        name: Publish site
         runs-on: ubuntu-latest
-        if: github.ref == 'refs/heads/main'
         steps:
-            - name: checkout
+            - name: Checkout main
               uses: actions/checkout@v4
-            - name: build_and_deploy
+            - name: Build and deploy
               uses: shalzz/zola-deploy-action@v0.17.2
               env:
-                  # Target branch
-                  PAGES_BRANCH: gh-pages
-                  TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
