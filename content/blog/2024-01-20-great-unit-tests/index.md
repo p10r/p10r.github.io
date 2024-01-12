@@ -47,6 +47,8 @@ Using integrated tests, your test code becomes harder to comprehend. This is a b
 
 ![](https://media1.tenor.com/m/Jk8Y7rMeZKoAAAAd/thanos-marvel.gif)
 
+[Taken from Tenor](https://tenor.com/view/thanos-marvel-iron-man-fun-isnt-something-one-considers-when-balancing-the-universe-but-this-does-put-a-smile-on-my-face-gif-21015323)
+
 I am unfortunately not Thanos, and you aren't as well, so there's not much smiling when bringing an integrated environment into a specific state for an edge case. The fact that it's really hard to keep all the integration test setups running really feels like balancing the universe. There's so much to look out for and it always ends up being extremely hard to maintain it. Isolation also becomes harder: You either spin up your app multiple times with different data sources or use one shared storage for all of your tests and reset it between every run.
 
 Furthermore, chances are high that bad maintainability will lead to a [broken window effect](https://blog.codinghorror.com/the-broken-window-theory/): Since maintainability is already bad, developers stop caring about it and introduce intransparent coupling.
