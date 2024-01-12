@@ -3,7 +3,7 @@ title = "Testing Mastery: Fast and Secure Application Tests"
 date = 2024-01-12
 +++
 
-Working in a big organization using service oriented architecture always means interaction, either by communicating with other teams or by calling other services. Blink once and three microservices have been called.
+Working in a big organisation using service oriented architecture always means interaction, either by communicating with other teams or by calling other services. Blink once and three microservices have been called.
 
 Our team had the chance to build a service that takes care of onboarding car dealers to a new product we offer. It works by subscribing to a Kafka stream that tracks dealer changes and, depending on the change, our service acts on it.
 Whenever such a change happens, we interact with a multitude of systems:
