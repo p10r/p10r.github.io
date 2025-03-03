@@ -1,6 +1,6 @@
 +++
 title = "Use Fixtures for Blissful Tests"
-date = 2025-03-02
+date = 2025-03-03
 +++
 
 Imagine you are testing a web page where you can add URLs, which then will be rendered as a
