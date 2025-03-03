@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <title>Philipp Mayer | Use Fixtures for Blissful Tests</title>
+    
+    <link rel="stylesheet" href="https://p10r.github.io/style.css?h=a2212b4f5f92f846de67">
+    
+</head>
+<body>
+    
+<header class="space">
+    <a href="https:&#x2F;&#x2F;p10r.github.io">&LeftArrow; Home</a>
+</header>
+
+    
+<main>
+    <h1>Use Fixtures for Blissful Tests</h1>
+    
+    <p class="secondary">3 March, 2025</p>
+    
+    <div class="space"></div>
+    <p>Imagine you are testing a web page where you can add URLs, which then will be rendered as a
+list. The result might look like this:</p>
+<pre data-lang="go" style="background-color:#ffffff;color:#000000;" class="language-go "><code class="language-go" data-lang="go"><span style="color:#ff5600;">func </span><span style="color:#21439c;">TestFollowing</span><span>(t </span><span style="color:#ff5600;">*</span><span>testing.</span><span style="color:#ff5600;">T</span><span>) {
+</span><span>    t.Run(</span><span style="color:#00a33f;">&quot;add feed&quot;</span><span>, </span><span style="color:#ff5600;">func</span><span>(t </span><span style="color:#ff5600;">*</span><span>testing.</span><span style="color:#ff5600;">T</span><span>) {
+</span><span>        feedStore </span><span style="color:#ff5600;">:= </span><span>NewFeedStore()
+</span><span>        routes </span><span style="color:#ff5600;">:= </span><span>ApiRoutes(feedStore)
+</span><span>        
+</span><span>        </span><span style="color:#919191;">// navigate to &quot;following&quot; page
+</span><span>        rec </span><span style="color:#ff5600;">:= </span><span>httptest.NewRecorder()
+</span><span>        req </span><span style="color:#ff5600;">:= </span><span>httptest.NewRequest(</span><span style="color:#00a33f;">&quot;GET&quot;</span><span>, </span><span style="color:#00a33f;">&quot;/following&quot;</span><span>, </span><span style="color:#a535ae;">nil</span><span>)
+</span><span>        routes.ServeHTTP(rec, req)
+</span><span>        
+</span><span>        doc, err </span><span style="color:#ff5600;">:= </span><span>goquery.NewDocumentFromReader(rec.Body)
+</span><span>        assert.NoError(t, err)
+</span><span>        
+</span><span>        </span><span style="color:#919191;">// check that feed list is empty
+</span><span>        list </span><span style="color:#ff5600;">:= </span><span>doc.Find(</span><span style="color:#00a33f;">`[data-testid=&quot;feedList&quot;]`</span><span>).Children()
+</span><span>        assert.Equal(t, list.Length(), 0)
+</span><span>        
+</span><span>        </span><span style="color:#919191;">// add new feed
+</span><span>        rec </span><span style="color:#ff5600;">= </span><span>httptest.NewRecorder()
+</span><span>        newFeed </span><span style="color:#ff5600;">:= </span><span style="color:#00a33f;">&quot;https://www.example.com&quot;
+</span><span>        form </span><span style="color:#ff5600;">:= </span><span>url.Values{}
+</span><span>        form.Add(</span><span style="color:#00a33f;">&quot;url&quot;</span><span>, newFeed)
+</span><span>        
+</span><span>        req </span><span style="color:#ff5600;">= </span><span>httptest.NewRequest(</span><span style="color:#00a33f;">&quot;POST&quot;</span><span>, </span><span style="color:#00a33f;">&quot;/following&quot;</span><span>, </span><span style="color:#a535ae;">nil</span><span>)
+</span><span>        req.Header.Add(</span><span style="color:#00a33f;">&quot;Content-Type&quot;</span><span>, </span><span style="color:#00a33f;">&quot;application/x-www-form-urlencoded&quot;</span><span>)
+</span><span>        req.PostForm </span><span style="color:#ff5600;">= </span><span>form
+</span><span>        
+</span><span>        routes.ServeHTTP(rec, req)
+</span><span>        assert.Equal(t, rec.Code, http.StatusMovedPermanently)
+</span><span>        
+</span><span>        rec </span><span style="color:#ff5600;">= </span><span>httptest.NewRecorder()
+</span><span>        routes.ServeHTTP(rec, httptest.NewRequest(</span><span style="color:#00a33f;">&quot;GET&quot;</span><span>, </span><span style="color:#00a33f;">&quot;/following&quot;</span><span>, </span><span style="color:#a535ae;">nil</span><span>))
+</span><span>        assert.Equal(t, rec.Code, http.StatusOK)
+</span><span>        
+</span><span>        doc, err </span><span style="color:#ff5600;">= </span><span>goquery.NewDocumentFromReader(rec.Body)
+</span><span>        assert.NoError(t, err)
+</span><span>        
+</span><span>        list </span><span style="color:#ff5600;">= </span><span>doc.Find(</span><span style="color:#00a33f;">`[data-testid=&quot;feedList&quot;]`</span><span>).Children()
+</span><span>        assert.Equal(t, list.Length(), 1)
+</span><span>        assert.Equal(t, list.First().Text(), newFeed)
+</span><span>    })
+</span><span>}
+</span></code></pre>
+<p>While this test looks good overall, it also has one major drawback: Understanding <em>what</em>
+is being tested is not easy, because one has to first read <em>how</em> the page is being queried.
+Implementation details are leaking into our test specification. </p>
+<p>The typical observation that this is happening are comments above certain (speak: the most
+complex) lines to explain to the next dev what's happening there.</p>
+<p>What can we do about it?</p>
+<h2 id="hiding-implementation-logic">Hiding Implementation Logic</h2>
+<p><img src="https://p10r.github.io/blog/use-fixtures-for-blissful-tests/cluttered.svg" alt="A cluttered test" />
+<em>A cluttered test</em>
+a</p>
+<p>Tests serve as documentation. Documentation should be easy to read. The best way to achieve
+this is by separating what is being tested from how it's being tested.</p>
+<p>I like to do this via different &quot;environments&quot;, which take care of setting up app and
+offer helper functions to interact with it.</p>
+<pre data-lang="go" style="background-color:#ffffff;color:#000000;" class="language-go "><code class="language-go" data-lang="go"><span style="color:#ff5600;">type </span><span style="color:#21439c;">webEnv </span><span style="color:#ff5600;">struct </span><span>{
+</span><span>	api http.</span><span style="color:#ff5600;">Handler
+</span><span>}
+</span><span>
+</span><span style="color:#ff5600;">func </span><span style="color:#21439c;">newWebEnv</span><span>() </span><span style="color:#ff5600;">*webEnv </span><span>{
+</span><span>	feedStore </span><span style="color:#ff5600;">:= </span><span>NewFeedStore()
+</span><span>	routes </span><span style="color:#ff5600;">:= </span><span>internal.ApiRoutes(feedStore)
+</span><span>	</span><span style="color:#ff5600;">return &amp;</span><span>webEnv{api: routes}
+</span><span>}
+</span><span>
+</span><span style="color:#ff5600;">func </span><span>(ui </span><span style="color:#ff5600;">*webEnv</span><span>) </span><span style="color:#21439c;">goToFollowingPage</span><span>(t </span><span style="color:#ff5600;">*</span><span>testing.</span><span style="color:#ff5600;">T</span><span>) </span><span style="color:#ff5600;">*</span><span>goquery.</span><span style="color:#ff5600;">Selection </span><span>{
+</span><span>	recorder </span><span style="color:#ff5600;">:= </span><span>httptest.NewRecorder()
+</span><span>	ui.api.ServeHTTP(recorder, httptest.NewRequest(</span><span style="color:#00a33f;">&quot;GET&quot;</span><span>, </span><span style="color:#00a33f;">&quot;/following&quot;</span><span>, </span><span style="color:#a535ae;">nil</span><span>))
+</span><span>
+</span><span>	doc, err </span><span style="color:#ff5600;">:= </span><span>goquery.NewDocumentFromReader(recorder.Body)
+</span><span>	</span><span style="color:#ff5600;">if </span><span>err </span><span style="color:#ff5600;">!= </span><span style="color:#a535ae;">nil </span><span>{
+</span><span>		t.Fatalf(</span><span style="color:#00a33f;">&quot;could not parse doc: %v&quot;</span><span>, err)
+</span><span>	}
+</span><span>
+</span><span>	</span><span style="color:#ff5600;">return </span><span>doc
+</span><span>}
+</span><span>
+</span><span style="color:#ff5600;">func </span><span>(ui </span><span style="color:#ff5600;">*webEnv</span><span>) </span><span style="color:#21439c;">addFeed</span><span>(t </span><span style="color:#ff5600;">*</span><span>testing.</span><span style="color:#ff5600;">T</span><span>, feedUrl </span><span style="color:#a535ae;">string</span><span>) {
+</span><span>	form </span><span style="color:#ff5600;">:= </span><span>url.Values{}
+</span><span>	form.Add(</span><span style="color:#00a33f;">&quot;url&quot;</span><span>, feedUrl)
+</span><span>
+</span><span>	req </span><span style="color:#ff5600;">:= </span><span>httptest.NewRequest(</span><span style="color:#00a33f;">&quot;POST&quot;</span><span>, </span><span style="color:#00a33f;">&quot;/following&quot;</span><span>, </span><span style="color:#a535ae;">nil</span><span>)
+</span><span>	req.Header.Add(</span><span style="color:#00a33f;">&quot;Content-Type&quot;</span><span>, </span><span style="color:#00a33f;">&quot;application/x-www-form-urlencoded&quot;</span><span>)
+</span><span>	req.PostForm </span><span style="color:#ff5600;">= </span><span>form
+</span><span>
+</span><span>	recorder </span><span style="color:#ff5600;">:= </span><span>httptest.NewRecorder()
+</span><span>	ui.api.ServeHTTP(recorder, req)
+</span><span>
+</span><span>	</span><span style="color:#ff5600;">if </span><span>recorder.Code </span><span style="color:#ff5600;">!= </span><span>http.StatusMovedPermanently {
+</span><span>		t.Fatalf(</span><span style="color:#00a33f;">&quot;failed to add feed: %s, status: %d&quot;</span><span>, feedUrl, recorder.Code)
+</span><span>	}
+</span><span>}
+</span></code></pre>
+<p>Using this instead of creating the requests directly inside the tests is already a huge
+success. To improve it even more, we can now also introduce a struct to represent the page we're testing.</p>
+<pre data-lang="go" style="background-color:#ffffff;color:#000000;" class="language-go "><code class="language-go" data-lang="go"><span style="color:#ff5600;">type </span><span style="color:#21439c;">FollowingPage </span><span style="color:#ff5600;">struct </span><span>{
+</span><span>	doc </span><span style="color:#ff5600;">*</span><span>goquery.</span><span style="color:#ff5600;">Document
+</span><span>}
+</span><span>
+</span><span style="color:#ff5600;">func </span><span style="color:#21439c;">NewFollowingPage</span><span>(doc </span><span style="color:#ff5600;">*</span><span>goquery.</span><span style="color:#ff5600;">Document</span><span>) </span><span style="color:#ff5600;">*FollowingPage </span><span>{
+</span><span>	</span><span style="color:#ff5600;">return &amp;</span><span>FollowingPage{doc: doc}
+</span><span>}
+</span><span>
+</span><span style="color:#ff5600;">func </span><span>(p </span><span style="color:#ff5600;">*FollowingPage</span><span>) </span><span style="color:#21439c;">FeedList</span><span>() </span><span style="color:#ff5600;">*</span><span>goquery.</span><span style="color:#ff5600;">Selection </span><span>{
+</span><span>	</span><span style="color:#ff5600;">return </span><span>p.doc.Find(</span><span style="color:#00a33f;">`[data-testid=&quot;feedList&quot;]`</span><span>)
+</span><span>}
+</span></code></pre>
+<p>The updated test will now look as follows:</p>
+<pre data-lang="go" style="background-color:#ffffff;color:#000000;" class="language-go "><code class="language-go" data-lang="go"><span style="color:#ff5600;">func </span><span style="color:#21439c;">TestFollowingPage</span><span>(t </span><span style="color:#ff5600;">*</span><span>testing.</span><span style="color:#ff5600;">T</span><span>) {
+</span><span>	t.Run(</span><span style="color:#00a33f;">&quot;add feed&quot;</span><span>, </span><span style="color:#ff5600;">func</span><span>(t </span><span style="color:#ff5600;">*</span><span>testing.</span><span style="color:#ff5600;">T</span><span>) {
+</span><span>		ui </span><span style="color:#ff5600;">:= </span><span>newWebEnv()
+</span><span>
+</span><span>		page </span><span style="color:#ff5600;">:= </span><span>ui.goToFollowingPage(t)
+</span><span>		assert.Equal(t, page.FeedList().Children().Length(), 0)
+</span><span>
+</span><span>		newFeed </span><span style="color:#ff5600;">:= </span><span style="color:#00a33f;">&quot;https://www.example.com&quot;
+</span><span>		ui.addFeed(t, newFeed)
+</span><span>
+</span><span>		page </span><span style="color:#ff5600;">= </span><span>ui.goToFollowingPage(t)
+</span><span>		assert.Equal(t, page.FeedList().Children().Length(), 1)
+</span><span>		assert.Equal(t, page.FeedList().Children().First().Text(), newFeed)
+</span><span>	})
+</span><span>}
+</span></code></pre>
+<p>Looking at the final result, we have improved our test in multiple aspects:</p>
+<ul>
+<li>The test is easy to read</li>
+<li>The test will not need to change when there is a change in the implementation</li>
+<li>It's cheaper to maintain: There's now a single place focusing on interactions with the app</li>
+<li><code>data-testid</code> and other page-specific helpers are now centralised in one place, which is
+<code>FollowingPage</code> </li>
+<li><code>webEnv</code> and <code>followingPage</code> can be easily reused across the test suite</li>
+</ul>
+
+</main>
+
+    <div class="dark-mode-buttons">
+        <button class="dark-mode-button" id="dark-mode-on"><img src="https://p10r.github.io/dark_mode.svg" width="24" height="24" alt="Dark mode" aria-label="dark mode toggle" title="Dark mode"></button>
+        <button class="dark-mode-button" id="dark-mode-off"><img src="https://p10r.github.io/light_mode.svg" width="24" height="24" alt="Light mode" aria-label="light mode toggle" title="Light mode"></button>
+    </div>
+    <script>
+        const cls = document.body.classList;
+        const getSessionTheme = sessionStorage.getItem("theme");
+        if (getSessionTheme === "dark") {
+            cls.toggle("dark-mode", true);
+        } else if (getSessionTheme === "light") {
+            cls.toggle("dark-mode", false);
+        } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+            cls.toggle("dark-mode", true);
+        }
+
+        document.getElementById("dark-mode-on").addEventListener("click", function(e) {
+            cls.toggle("dark-mode", true);
+            sessionStorage.setItem("theme", "dark");
+        });
+        document.getElementById("dark-mode-off").addEventListener("click", function(e) {
+            cls.toggle("dark-mode", false);
+            sessionStorage.setItem("theme", "light");
+        });
+    </script>
+    <noscript>
+        <style>
+            .dark-mode-buttons {
+                display: none;
+            }
+        </style>
+    </noscript>
+</body>
+</html>
