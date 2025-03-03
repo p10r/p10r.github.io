@@ -53,8 +53,13 @@ func TestFollowing(t *testing.T) {
 
 While this test looks good overall, it also has one major drawback: Understanding _what_
 is being tested is not easy, because one has to first read _how_ the page is being queried.
+Implementation details are leaking into our test specification. Let's try to put the code
+comments into actual code.
 
-## Focus on the _WHAT_
+## Hiding Implementation Logic
+
+![A cluttered test](cluttered.svg)
+*A cluttered test*
 
 Tests serve as documentation. Documentation should be easy to read. The best way to achieve
 this is by separating what is being tested from how it's being tested.
@@ -142,7 +147,8 @@ func TestFollowingPage(t *testing.T) {
 Looking at the final result, we have improved our test in multiple aspects:
 
 - The test is easy to read
-- There's now a single place to maintain the interactions with the app
+- The test will not need to change when there is a change in the implementation
+- It's cheaper to maintain: There's now a single place focusing on interactions with the app
 - `data-testid` and other page-specific helpers are now centralised in one place, which is
   `FollowingPage` 
 - `webEnv` and `followingPage` can be easily reused across the test suite
