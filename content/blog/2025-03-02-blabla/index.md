@@ -53,13 +53,18 @@ func TestFollowing(t *testing.T) {
 
 While this test looks good overall, it also has one major drawback: Understanding _what_
 is being tested is not easy, because one has to first read _how_ the page is being queried.
-Implementation details are leaking into our test specification. Let's try to put the code
-comments into actual code.
+Implementation details are leaking into our test specification. 
+
+The typical observation that this is happening are comments above certain (speak: the most
+complex) lines to explain to the next dev what's happening there.
+
+What can we do about it?
 
 ## Hiding Implementation Logic
 
 ![A cluttered test](cluttered.svg)
 *A cluttered test*
+a
 
 Tests serve as documentation. Documentation should be easy to read. The best way to achieve
 this is by separating what is being tested from how it's being tested.
