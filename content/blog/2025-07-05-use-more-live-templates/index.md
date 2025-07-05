@@ -1,5 +1,5 @@
 +++
-title = "Use IntelliJ's Live Templates!"
+title = "Hidden Gem: IntelliJ's Live Templates"
 date = 2025-07-05
 +++
 
