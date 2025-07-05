@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <title>Philipp Mayer | Hidden Gem: IntelliJ&#x27;s Live Templates</title>
+    
+    <link rel="stylesheet" href="https://p10r.github.io/style.css?h=a2212b4f5f92f846de67">
+    
+</head>
+<body>
+    
+<header class="space">
+    <a href="https:&#x2F;&#x2F;p10r.github.io">&LeftArrow; Home</a>
+</header>
+
+    
+<main>
+    <h1>Hidden Gem: IntelliJ&#x27;s Live Templates</h1>
+    
+    <p class="secondary">5 July, 2025</p>
+    
+    <div class="space"></div>
+    <p>IntelliJ IDEA is a beauty of an IDE. One feature which I see people rarely use is
+called <a href="https://www.jetbrains.com/help/idea/using-live-templates.html">&quot;Live Templates&quot;</a>.
+The IDE comes with tons of them already installed. Let's have a look!</p>
+<h2 id="using-live-templates">Using Live Templates</h2>
+<p>Say you want to call the following function:</p>
+<pre data-lang="go" style="background-color:#ffffff;color:#000000;" class="language-go "><code class="language-go" data-lang="go"><span style="color:#ff5600;">func </span><span style="color:#21439c;">listArtists</span><span>(ctx context.</span><span style="color:#ff5600;">Context</span><span>, id </span><span style="color:#a535ae;">string</span><span>) (</span><span style="color:#a535ae;">string</span><span>, </span><span style="color:#a535ae;">error</span><span>) {
+</span><span style="color:#919191;">// implementation
+</span><span>}
+</span></code></pre>
+<p>You would need to call it, assign the result to a variable and handle the error. Lots of
+tedious work.</p>
+<p>Live Templates come in handy here. When writing the function call, extend it by typing
+<code>.varCheckError</code> and it will do all of that automatically for you:</p>
+<p><img src="https://p10r.github.io/blog/use-more-live-templates/img.png" alt="img.png" /></p>
+<p>Once you hit Enter, IntelliJ will do its completion and lets you tab through the names of the
+variables and the return inside the error block.</p>
+<p><img src="https://p10r.github.io/blog/use-more-live-templates/img_1.png" alt="img_1.png" /></p>
+<h2 id="adding-new-live-templates">Adding New Live Templates</h2>
+<p>If you find yourself writing the same code over and over again, it might be time to add it as a
+live template.
+One recent example for me is that I like to throw in a little <code>panic(&quot;TODO: Implement me&quot;)</code> in
+a function, just to satisfy the compiler for a second.</p>
+<p>To add a new template:</p>
+<p>Highlight the code you want to have as a template</p>
+<p><img src="https://p10r.github.io/blog/use-more-live-templates/img_2.png" alt="img_2.png" /></p>
+<p>Hit double shift/&quot;Search Everywhere&quot; and type in &quot;Save as Live Template&quot;.</p>
+<p><img src="https://p10r.github.io/blog/use-more-live-templates/img_3.png" alt="img_3.png" /></p>
+<h2 id="adding-parameters-to-live-templates">Adding Parameters to Live Templates</h2>
+<p>If you go to <code>Settings &gt; Editor &gt; Live Templates</code>, you also get an editor to add Live
+Templates, which is helpful when defining parameters inside your templates.</p>
+<p>Parameters need to be enclosed by dollar signs. Here's one of my Live Templates for creating a
+test in Go:</p>
+<pre style="background-color:#ffffff;color:#000000;"><code><span>// Type &quot;trun&quot; to trigger it
+</span><span>t.Run(&quot;$NAME$&quot;, func(t *testing.T) {
+</span><span>	$END$	
+</span><span>})
+</span></code></pre>
+<p>Upon hitting Enter, the cursor will first jump to <code>$NAME$</code>, which you then set and after
+hitting Enter for a second time, the cursor will jump to <code>$END$</code>.</p>
+<p>Overall, the process is really intuitive, and in case one hits a road block, they can just
+scroll through the existing Live Templates.</p>
+<h2 id="my-top-5-live-templates">My Top 5 Live Templates</h2>
+<ol>
+<li>Kotlin/Java: <code>.val</code> to create values. <code>&quot;1234&quot;.val</code> becomes <code>val &lt;your name here&gt; = &quot;1234&quot;</code></li>
+<li>Kotlin/Java: <code>.sout</code> after a command will auto-complete the code to <code>println(variable)</code></li>
+<li>Go: <code>.varCheckError</code> to create a variable and check the error result</li>
+<li>Go (custom): <code>trun</code> to create a test (see above)</li>
+<li>Kotlin/Java (custom): <code>.debug</code> will add a <code>.also(::println)</code> to the end of a statement,
+which is handy since it doesn't change the return type of the value, unlike <code>.sout</code>.</li>
+</ol>
+<p>Have fun experimenting!</p>
+<p>Philipp</p>
+
+</main>
+
+    <div class="dark-mode-buttons">
+        <button class="dark-mode-button" id="dark-mode-on"><img src="https://p10r.github.io/dark_mode.svg" width="24" height="24" alt="Dark mode" aria-label="dark mode toggle" title="Dark mode"></button>
+        <button class="dark-mode-button" id="dark-mode-off"><img src="https://p10r.github.io/light_mode.svg" width="24" height="24" alt="Light mode" aria-label="light mode toggle" title="Light mode"></button>
+    </div>
+    <script>
+        const cls = document.body.classList;
+        const getSessionTheme = sessionStorage.getItem("theme");
+        if (getSessionTheme === "dark") {
+            cls.toggle("dark-mode", true);
+        } else if (getSessionTheme === "light") {
+            cls.toggle("dark-mode", false);
+        } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+            cls.toggle("dark-mode", true);
+        }
+
+        document.getElementById("dark-mode-on").addEventListener("click", function(e) {
+            cls.toggle("dark-mode", true);
+            sessionStorage.setItem("theme", "dark");
+        });
+        document.getElementById("dark-mode-off").addEventListener("click", function(e) {
+            cls.toggle("dark-mode", false);
+            sessionStorage.setItem("theme", "light");
+        });
+    </script>
+    <noscript>
+        <style>
+            .dark-mode-buttons {
+                display: none;
+            }
+        </style>
+    </noscript>
+</body>
+</html>

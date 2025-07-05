@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+        <loc>https://p10r.github.io/</loc>
+    </url>
+    <url>
+        <loc>https://p10r.github.io/about/</loc>
+    </url>
+    <url>
+        <loc>https://p10r.github.io/blog/</loc>
+    </url>
+    <url>
+        <loc>https://p10r.github.io/blog/hello/</loc>
+        <lastmod>2023-08-14</lastmod>
+    </url>
+    <url>
+        <loc>https://p10r.github.io/blog/testing-mastery-fast-and-secure-app-tests/</loc>
+        <lastmod>2024-01-12</lastmod>
+    </url>
+    <url>
+        <loc>https://p10r.github.io/blog/use-fixtures-for-blissful-tests/</loc>
+        <lastmod>2025-03-03</lastmod>
+    </url>
+    <url>
+        <loc>https://p10r.github.io/blog/use-more-live-templates/</loc>
+        <lastmod>2025-07-05</lastmod>
+    </url>
+</urlset>
