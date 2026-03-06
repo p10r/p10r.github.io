@@ -4,7 +4,7 @@ pubDate: 03/03/2025 15:10
 author: "Philipp Mayer"
 tags:
   - Testing
-imgUrl: '../../../assets/astro.jpeg'
+# imgUrl: '../../../assets/astro.jpeg'
 description: Let's fix readability in tests
 ---
 

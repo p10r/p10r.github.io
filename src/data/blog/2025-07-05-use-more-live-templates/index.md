@@ -4,7 +4,7 @@ pubDate: 05/07/2025 16:07
 author: "Philipp Mayer"
 tags:
 - Testing
-imgUrl: '../../../assets/astro.jpeg'
+# imgUrl: '../../../assets/astro.jpeg'
 description: Learn how to use IntelliJ IDEA's Live templates
 ---
 

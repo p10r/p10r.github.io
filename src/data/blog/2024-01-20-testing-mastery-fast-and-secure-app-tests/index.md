@@ -4,7 +4,7 @@ pubDate: 12/01/2024 00:00
 author: "Philipp Mayer"
 tags:
 - Testing
-imgUrl: '../../../assets/astro.jpeg'
+# imgUrl: './focus.svg'
 description: Don't trust you unit tests? This might help.
 ---
 
